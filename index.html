@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auxiliar Administrativo JCYL - Panel de Estudio</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0056b3',
+              600: '#004494',
+              700: '#003373',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .progress-bar-transition {
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-transition {
+      transition: all 0.2s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans min-h-screen pb-16 transition-colors duration-200">
+
+  <div class="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6">
+    
+    <!-- Top Bar with Theme Toggle -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-brand-50 dark:bg-slate-800 text-brand-600 dark:text-blue-400 rounded-full text-xs font-semibold uppercase tracking-wider border border-brand-100 dark:border-slate-700">
+        <i class="fa-solid fa-graduation-cap"></i> JCYL - Oposiciones
+      </div>
+      <button id="themeToggleBtn" onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-sm">
+        <i class="fa-solid fa-moon dark:hidden"></i>
+        <i class="fa-solid fa-sun hidden dark:inline text-amber-400"></i>
+      </button>
+    </div>
+
+    <!-- Header Section -->
+    <header class="text-center mb-8 bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700/80 relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-brand-500 via-blue-500 to-emerald-500"></div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+        Auxiliar Administrativo JCYL - Panel de Estudio
+      </h1>
+      <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+        Plataforma interactiva para el seguimiento del temario oficial con acceso directo a los temas en PDF y test de práctica.
+      </p>
+    </header>
+
+    <!-- Dashboard Stats Section -->
+    <section class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700/80 mb-6">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-chart-line text-brand-500 dark:text-blue-400 text-lg"></i>
+          <h2 class="font-bold text-slate-800 dark:text-slate-200 text-base">Progreso Global del Temario</h2>
+        </div>
+        <span id="progressPercent" class="text-2xl font-extrabold text-brand-600 dark:text-blue-400">0%</span>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-4 p-0.5 overflow-hidden border border-slate-200/50 dark:border-slate-600/50">
+        <div id="progressBarFill" class="progress-bar-transition bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full w-0 shadow-sm"></div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-slate-100 dark:border-slate-700/80 text-center">
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700">
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Total Temas</p>
+          <p id="statTotal" class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">28</p>
+        </div>
+        <div class="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-800/50">
+          <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium mb-1">Estudiados</p>
+          <p id="statStudied" class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">0</p>
+        </div>
+        <div class="p-3 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-800/50">
+          <p class="text-xs text-rose-600 dark:text-rose-400 font-medium mb-1">Pendientes</p>
+          <p id="statPending" class="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400">28</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Controls and Filters -->
+    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700/80 mb-6 space-y-3">
+      
+      <div class="flex flex-col md:flex-row gap-3">
+        <!-- Search Input -->
+        <div class="relative flex-1">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-sm"></i>
+          </div>
+          <input 
+            type="text" 
+            id="searchInput" 
+            onkeyup="applyFilters()" 
+            placeholder="Buscar tema..." 
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:text-white placeholder:text-slate-400 transition-all"
+          >
+        </div>
+
+        <!-- Filter Select -->
+        <div class="w-full md:w-64">
+          <select 
+            id="filterSelect" 
+            onchange="applyFilters()" 
+            class="w-full py-2.5 px-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all cursor-pointer"
+          >
+            <option value="all">📂 Todos los grupos (28)</option>
+            <option value="grupo1">🏛️ Grupo I (19)</option>
+            <option value="grupo2">💻 Grupo II (9)</option>
+            <option value="pending">⏳ Solo Pendientes</option>
+            <option value="studied">✅ Solo Completados</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/80 text-xs">
+        <div class="flex gap-2">
+          <button onclick="marcarTodos()" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded-lg font-medium transition-colors flex items-center gap-1.5">
+            <i class="fa-solid fa-check-double"></i> Marcar todos
+          </button>
+          <button onclick="desmarcarTodos()" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg font-medium transition-colors flex items-center gap-1.5">
+            <i class="fa-solid fa-square-minus"></i> Desmarcar todos
+          </button>
+        </div>
+        <button onclick="reiniciarProgreso()" class="px-3 py-1.5 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/50 rounded-lg font-medium transition-colors flex items-center gap-1.5 ml-auto">
+          <i class="fa-solid fa-rotate-left"></i> Reiniciar
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Main Content List -->
+    <main id="contentContainer" class="space-y-6">
+      <!-- Topics generated via JS -->
+    </main>
+
+    <!-- No Results Placeholder -->
+    <div id="noResults" class="hidden text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 mt-4">
+      <i class="fa-solid fa-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
+      <p class="text-slate-600 dark:text-slate-300 font-medium">No se encontraron temas coincidentes</p>
+      <p class="text-slate-400 text-xs mt-1">Prueba a modificar los términos de búsqueda o el filtro</p>
+    </div>
+
+    <!-- External Test Section CTA -->
+    <section class="mt-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-brand-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+      <div class="absolute -right-8 -bottom-8 opacity-10 text-9xl">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </div>
+      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+        <div class="space-y-2 max-w-xl">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold text-white uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-vial"></i> Plataforma Externa de Test
+          </div>
+          <h2 class="text-xl sm:text-2xl font-bold">Comprueba tus conocimientos</h2>
+          <p class="text-blue-100 text-sm">
+            Practica con exámenes y tests interactivos online para consolidar tu aprendizaje y ponerte a prueba antes del examen oficial.
+          </p>
+        </div>
+        <a 
+          href="https://www.temasytest.com/indexonline_auxiliar_cyl.php" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-blue-700 hover:bg-blue-50 font-bold text-sm rounded-xl transition-all shadow-md hover:shadow-xl hover:scale-105 active:scale-95 flex-shrink-0"
+        >
+          <span>Ir a hacer Test</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-xs text-slate-400 dark:text-slate-500 space-y-1">
+      <p>Material oficial para Auxiliar Administrativo - Junta de Castilla y León</p>
+      <p>El progreso se guarda de manera automática en el navegador</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Complete Dataset
+    const gruposData = [
+      {
+        grupoId: "grupo1",
+        title: "Grupo I. Organización Política y Administrativa",
+        badge: "Temas 1 a 19",
+        topics: [
+          ["Tema 1. La Constitución Española", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBSPsMasabjRpk-aW_8iWrSATMe76QFUVoCLDC9X4Z7IUY?e=O1uYhf"],
+          ["Tema 2. Administración General del Estado", "https://1drv.ms/b/c/2484b7d836b14ed0/IQAk7jfYQ7GETJpGbo-cLuP7AY11knIE8F5HPG2BkSIeqwY?e=RehgVx"],
+          ["Tema 3. Administración Local", "https://1drv.ms/b/c/2484b7d836b14ed0/IQDgv8q0sOrgSoxyKbPdhRfvAdVvB-U45tmPEkBGlSMqVkM?e=G8LX4X"],
+          ["Tema 4. Unión Europea", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBcnlosxSGeS6fZ9IqZTt9HAc3SwoHYmaDJg4nIrbIfPkw?e=DFFri7"],
+          ["Tema 5. Estatuto de Autonomía", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBijdeXjqeyRqb3I3ipI-f8Aaxiiocda5peWMsRJBDzpEI?e=OTf3TP"],
+          ["Tema 6. Cortes de Castilla y León", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBMrcTF806GQbvcqcqh5sQjAZKJA1YVeKNacPzvesbf3-E?e=kTJDek"],
+          ["Tema 7. Instituciones propias", "https://1drv.ms/b/c/2484b7d836b14ed0/IQDth_zpgO3vSZ3_NH_9TxqcARF7-cg6_XxcdNlTj-N_MFM?e=COQDWZ"],
+          ["Tema 8. Gobierno de Castilla y León", "https://1drv.ms/b/c/2484b7d836b14ed0/IQDwEib1o2u6QrP7VhRqP0JOASlgJ5Ptnle71Oqr7odOo5o?e=KRAZtT"],
+          ["Tema 9. Administración de Castilla y León", "https://1drv.ms/b/c/2484b7d836b14ed0/IQCRp9cWJ912RpaUeHryZ8A4AR8aeYWhhDl11w76X2kbZuk?e=ECtHY3"],
+          ["Tema 10. Sector Público", "https://1drv.ms/b/c/2484b7d836b14ed0/IQDc3SXTxZ0YQpPS7NGVFa9eAZZbjx-d0caPZ0GBwvNZtKA?e=TfHJWt"],
+          ["Tema 11. Fuentes del Derecho Administrativo", "https://1drv.ms/b/c/2484b7d836b14ed0/IQB-QIkPbzrWT6N7znjhTr8wAWKASuldfLdBqm0QOxODXF4?e=roucdW"],
+          ["Tema 12. Acto Administrativo", "https://1drv.ms/b/c/2484b7d836b14ed0/IQAVGPC3-vdEQrGwhj0SLdJ_AUowWu0fxZxyFOcUH48o0Ag?e=o3fX1U"],
+          ["Tema 13. Procedimiento Administrativo", "https://1drv.ms/b/c/2484b7d836b14ed0/IQCyvs2fj1W-SIyvp7ECpO_8ARK1tPMz3rGDUnj9BOxSReY?e=R9BFfF"],
+          ["Tema 14. Órganos Administrativos", "https://1drv.ms/b/c/2484b7d836b14ed0/IQB1rJIdcflNTbfCCIqwbKlkAdqhE2esvDovyPoeRiFGaUc?e=aT002e"],
+          ["Tema 15. Estatuto Básico del Empleado Público", "https://1drv.ms/b/c/2484b7d836b14ed0/IQDwMhhZ6hN-TaZazZfAdQQVAYLFWxX9BPoQWwleitwo_fY?e=dbZ88l"],
+          ["Tema 16. Función Pública de Castilla y León", "https://1drv.ms/b/c/2484b7d836b14ed0/IQAG6uoI3yLnS4coz_Ll8qfrAZqlS8wwJIqMWxvEDn9W0SQ?e=yXfdCL"],
+          ["Tema 17. Sindicación e incompatibilidades", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBE_0jRM17mT7zrlPR96MUKAVopLnyZJanJDw8YhUeB7Cw?e=KsXefu"],
+          ["Tema 18. Presupuesto de Castilla y León", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBGO6s3Oe9NSLgJ6dS_2gl_AZTcI65zkZB0vmEHXySRp7o?e=DmTW1q"],
+          ["Tema 19. Igualdad y no discriminación", "https://1drv.ms/b/c/2484b7d836b14ed0/IQAlftl0IMqeQol4tNtIJfExAftmdKBRNCdyJjOYmaBGnp8?e=elxb9P"]
+        ]
+      },
+      {
+        grupoId: "grupo2",
+        title: "Grupo II. Competencias",
+        badge: "Temas 20 a 28",
+        topics: [
+          ["Tema 20. Derechos de las personas", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBCBGruG38KR6TzYL37w2F1AeUPwXByy9s1rkLFf1LgiRI?e=uDjAg4"],
+          ["Tema 21. Oficinas de asistencia", "https://1drv.ms/b/c/2484b7d836b14ed0/IQC_piG-H6PsRbFHvEw_TgybAcRCik8Ljmt06uKQ6Sygy40?e=sbz5ch"],
+          ["Tema 22. Administración electrónica", "https://1drv.ms/b/c/2484b7d836b14ed0/IQA1e4Gs0W_qRa7_SU0EyeckAUJMW15oLP0z9MEk0si_P9A?e=YlxR31"],
+          ["Tema 23. Transparencia y protección de datos", "https://1drv.ms/b/c/2484b7d836b14ed0/IQCpQ5WBmy-TRbLn00xZE3VYAf7x-7hJt0erQFBTcOlB3kI?e=xiXBld"],
+          ["Tema 24. Documento administrativo", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBHrxwY7BgSRrzFUMQl7jJCAbt5OrEtg-LfezYHvdsPSQs?e=qwETeq"],
+          ["Tema 25. Informática básica", "https://1drv.ms/b/c/2484b7d836b14ed0/IQDFghBnfBFhRaYFtZWUPwXqAcROM8PO2-4zVppFGuHJpSI?e=nT3Wbg"],
+          ["Tema 26. Word y Excel Microsoft 365", "https://1drv.ms/b/c/2484b7d836b14ed0/IQA601_39noIQ73hfVin2Vu4Af1MwW3_vZ_TqgpI8G-J8NI?e=EBWpCS"],
+          ["Tema 27. Correo electrónico e Internet", "https://1drv.ms/b/c/2484b7d836b14ed0/IQDxgRbirZg7RZM1JGU0y-ijAXboUv5KQvXffHi5fYoVqT0?e=n62rdK"],
+          ["Tema 28. Seguridad y salud laboral", "https://1drv.ms/b/c/2484b7d836b14ed0/IQBRRky3lIRyRKmJ5mjlUUgeASQVt8kRcjingauJsxjKegA?e=ca8MQr"]
+        ]
+      }
+    ];
+
+    let studiedSet = new Set();
+    let globalTopicIndex = 1;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initTheme();
+      loadProgress();
+      renderAll();
+    });
+
+    function initTheme() {
+      if (localStorage.getItem("jcyl_dark_mode") === "true" || 
+          (!("jcyl_dark_mode" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("jcyl_dark_mode", isDark);
+    }
+
+    function renderAll() {
+      const container = document.getElementById("contentContainer");
+      container.innerHTML = "";
+      globalTopicIndex = 1;
+
+      gruposData.forEach(grupo => {
+        const groupEl = document.createElement("section");
+        groupEl.className = "group-block bg-white dark:bg-slate-800 rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-700/80 shadow-sm";
+        groupEl.setAttribute("data-group", grupo.grupoId);
+
+        let groupHeaderHtml = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-700">
+            <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-brand-500 text-sm"></i>
+              ${grupo.title}
+            </h2>
+            <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg w-fit">
+              ${grupo.badge}
+            </span>
+          </div>
+          <div class="topic-list space-y-3">
+        `;
+
+        let topicsHtml = "";
+
+        grupo.topics.forEach(topic => {
+          const currentId = globalTopicIndex;
+          const isCompleted = studiedSet.has(currentId);
+          const topicName = topic[0];
+          const pdfUrl = topic[1];
+
+          topicsHtml += `
+            <div 
+              class="topic-card card-transition p-3.5 sm:p-4 rounded-xl border ${
+                isCompleted 
+                  ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60' 
+                  : 'bg-slate-50/60 dark:bg-slate-900/40 border-slate-200/70 dark:border-slate-700/60'
+              } flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+              data-topic-id="${currentId}"
+              data-group-id="${grupo.grupoId}"
+              data-search="${topicName.toLowerCase()}"
+              data-completed="${isCompleted}"
+            >
+              <div class="flex items-start gap-3 flex-1">
+                <button 
+                  onclick="toggleTopic(${currentId})" 
+                  class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-lg border ${
+                    isCompleted 
+                      ? 'bg-emerald-500 border-emerald-500 text-white' 
+                      : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-transparent hover:border-brand-500'
+                  } flex items-center justify-center text-xs transition-all"
+                  title="${isCompleted ? 'Marcar como pendiente' : 'Marcar como completado'}"
+                >
+                  <i class="fa-solid fa-check"></i>
+                </button>
+                <div>
+                  <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm sm:text-base leading-snug">
+                    ${topicName}
+                  </h3>
+                  <span class="text-[11px] font-medium ${isCompleted ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}">
+                    ${isCompleted ? 'Completado' : 'Pendiente'}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/50 dark:border-slate-700/50">
+                <button 
+                  onclick="toggleTopic(${currentId})" 
+                  class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-medium ${
+                    isCompleted 
+                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300' 
+                      : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  } transition-colors"
+                >
+                  ${isCompleted ? 'Completado' : 'Marcar visto'}
+                </button>
+
+                <a 
+                  href="${pdfUrl}" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  class="flex-1 sm:flex-initial px-3.5 py-1.5 bg-brand-500 hover:bg-brand-600 text-white rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <i class="fa-solid fa-file-pdf"></i>
+                  <span>Abrir PDF</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-70"></i>
+                </a>
+              </div>
+            </div>
+          `;
+
+          globalTopicIndex++;
+        });
+
+        groupEl.innerHTML = groupHeaderHtml + topicsHtml + `</div>`;
+        container.appendChild(groupEl);
+      });
+
+      updateStats();
+    }
+
+    function toggleTopic(id) {
+      if (studiedSet.has(id)) {
+        studiedSet.delete(id);
+      } else {
+        studiedSet.add(id);
+      }
+      saveProgress();
+      renderAll();
+      applyFilters();
+    }
+
+    function marcarTodos() {
+      for (let i = 1; i <= 28; i++) {
+        studiedSet.add(i);
+      }
+      saveProgress();
+      renderAll();
+      applyFilters();
+    }
+
+    function desmarcarTodos() {
+      studiedSet.clear();
+      saveProgress();
+      renderAll();
+      applyFilters();
+    }
+
+    function reiniciarProgreso() {
+      if (confirm("¿Seguro que deseas reiniciar todo el progreso de estudio?")) {
+        desmarcarTodos();
+      }
+    }
+
+    function updateStats() {
+      const total = 28;
+      const studied = studiedSet.size;
+      const pending = total - studied;
+      const percent = Math.round((studied / total) * 100);
+
+      document.getElementById("statTotal").innerText = total;
+      document.getElementById("statStudied").innerText = studied;
+      document.getElementById("statPending").innerText = pending;
+
+      document.getElementById("progressPercent").innerText = `${percent}%`;
+      document.getElementById("progressBarFill").style.width = `${percent}%`;
+    }
+
+    function applyFilters() {
+      const query = document.getElementById("searchInput").value.toLowerCase().trim();
+      const filterValue = document.getElementById("filterSelect").value;
+      const groupBlocks = document.querySelectorAll(".group-block");
+      let totalVisible = 0;
+
+      groupBlocks.forEach(group => {
+        const groupId = group.getAttribute("data-group");
+        const cards = group.querySelectorAll(".topic-card");
+        let groupVisibleCount = 0;
+
+        cards.forEach(card => {
+          const searchData = card.getAttribute("data-search");
+          const isCompleted = card.getAttribute("data-completed") === "true";
+
+          const matchesQuery = searchData.includes(query);
+          let matchesFilter = true;
+
+          if (filterValue === "grupo1" && groupId !== "grupo1") matchesFilter = false;
+          if (filterValue === "grupo2" && groupId !== "grupo2") matchesFilter = false;
+          if (filterValue === "studied" && !isCompleted) matchesFilter = false;
+          if (filterValue === "pending" && isCompleted) matchesFilter = false;
+
+          if (matchesQuery && matchesFilter) {
+            card.style.display = "flex";
+            groupVisibleCount++;
+            totalVisible++;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        if (groupVisibleCount === 0) {
+          group.style.display = "none";
+        } else {
+          group.style.display = "block";
+        }
+      });
+
+      const noResults = document.getElementById("noResults");
+      if (totalVisible === 0) {
+        noResults.classList.remove("hidden");
+      } else {
+        noResults.classList.add("hidden");
+      }
+    }
+
+    function saveProgress() {
+      const arr = Array.from(studiedSet);
+      localStorage.setItem("jcyl_studied_v3", JSON.stringify(arr));
+    }
+
+    function loadProgress() {
+      try {
+        const saved = localStorage.getItem("jcyl_studied_v3");
+        if (saved) {
+          studiedSet = new Set(JSON.parse(saved));
+        }
+      } catch (e) {
+        studiedSet = new Set();
+      }
+    }
+  </script>
+</body>
+</html>
